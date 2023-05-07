@@ -27,6 +27,33 @@ However, compared to those libraries, it intentionally doesn't include some feat
 * Support for chunked transfer encoding (Adafruit_CircuitPython_HTTPServer has this).
 * Support for serving static files (Adafruit_CircuitPython_HTTPServer has this).
 
+Installation
+------------
+
+### Python
+
+Install via Pip:
+
+```sh
+pip install biplane
+```
+
+### CircuitPython
+
+First, ensure you've set up CircUp according to the [Adafruit CircUp guide](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup). Then:
+
+```sh
+circup install biplane
+```
+
+For CircuitPython devices that don't support the CIRCUITPY drive used to upload code, you can instead manually upload `biplane.py` from this folder to `lib/biplane.py` on the board using one of the following methods:
+
+* Using the Web Workflow via Bluetooth or WiFi. See the [AdaFruit Web Workflow guide](https://learn.adafruit.com/circuitpython-with-esp32-quick-start/setting-up-web-workflow) for more details.
+* Using [Thonny](https://thonny.org/), which supports uploading code to CircuitPython.
+* As a last-resort slow-but-simple option, using the CircuitPython REPL that you can access over the serial port:
+    1. Run `python3 -c 'f=open("biplane.py");code=f.read();print(f"code={repr(code)};open(\"lib/biplane.py\",\"w\").write(code) if len(code)=={len(code)} else print(\"CODE CORRUPTED\")")'` in this folder, and copy the output of that command to the clipboard. This output is CircuitPython code that creates `lib/biplane.py` with the correct contents inside.
+    2. Paste the copied output into the CircuitPython REPL and run it. If it outputs "CODE CORRUPTED", that means the code changed between when you pasted it and when it arrived in CircuitPython, which means your serial terminal is sending the characters too quickly and CircuitPython can't keep up (common when using `screen` or `minicom`); to fix this, configure your terminal to wait 2ms-4ms after sending each character and try again (2ms is usually good enough). Also, make sure that you do this after freshly resetting the board.
+
 Examples
 --------
 
@@ -40,7 +67,7 @@ import biplane
 server = biplane.Server()
 
 @server.route("/", "GET")
-def main(*args):
+def main(query_parameters, headers, body):
   return biplane.Response("<b>Hello, world!</b>", content_type="text/html")
 
 for _ in server.circuitpython_start_wifi_ap("test", "some_password", "app"):
@@ -81,7 +108,7 @@ import biplane
 server = biplane.Server()
 
 @server.route("/", "GET")
-def main(*args):
+def main(query_parameters, headers, body):
   return biplane.Response("<b>Hello, world!</b>", content_type="text/html")
 
 def asyncio_sleep(seconds):  # minimal implementation of asyncio.sleep() as a generator
@@ -117,7 +144,7 @@ import biplane
 server = biplane.Server()
 
 @server.route("/", "GET")
-def main(*args):
+def main(query_parameters, headers, body):
   return biplane.Response("<b>Hello, world!</b>", content_type="text/html")
 
 async def run_server():

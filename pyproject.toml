@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "biplane"
+version = "0.0.0+auto.0"
+authors = [{name="Uberi", email="me@anthonyz.ca"}]
+description = "Minimal, fast, robust HTTP server library for Python/CircuitPython that uses non-blocking concurrent I/O even when asyncio isn't available!"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Uberi/biplane/"
+"Bug Tracker" = "https://github.com/Uberi/biplane/issues"

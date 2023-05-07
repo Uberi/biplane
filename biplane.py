@@ -188,7 +188,7 @@ class Server:
       client_processors = new_client_processors
       yield
 
-  def circuitpython_start_wifi_ap(self, ssid, password, mdns_hostname=None, listen_on=('0.0.0.0', 80), max_parallel_connections=5):
+  def circuitpython_start_wifi_ap(self, ssid, password, mdns_hostname, listen_on=('0.0.0.0', 80), max_parallel_connections=5):
     import wifi
     import mdns
     import socketpool
