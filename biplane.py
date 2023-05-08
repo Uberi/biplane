@@ -7,7 +7,7 @@ __repo__ = "https://github.com/Uberi/biplane.git"
 
 
 class BufferedNonBlockingSocket:
-  def __init__(self, sock, buffer_size=2):
+  def __init__(self, sock, buffer_size=1024):
     self.sock = sock
     self.read_buffer = bytearray(buffer_size)
     self.start, self.end = 0, 0
@@ -193,23 +193,23 @@ class Server:
     import mdns
     import socketpool
     wifi.radio.start_ap(ssid=ssid, password=password)
-    print(f"starting mDNS at {SERVICE_HOSTNAME}.local (IP address {wifi.radio.ipv4_address_ap})")
+    print(f"starting mDNS at {mdns_hostname}.local (IP address {wifi.radio.ipv4_address_ap})")
     server = mdns.Server(wifi.radio)
     server.hostname = mdns_hostname
     server.advertise_service(service_type="_http", protocol="_tcp", port=listen_on[1])
     pool = socketpool.SocketPool(wifi.radio)
     with pool.socket() as server_socket:
-      yield from self.start_server(server_socket, listen_on, max_parallel_connections)
+      yield from self.start(server_socket, listen_on, max_parallel_connections)
 
   def circuitpython_start_wifi_station(self, ssid, password, mdns_hostname, listen_on=('0.0.0.0', 80), max_parallel_connections=5):
     import wifi
     import mdns
     import socketpool
     wifi.radio.connect(ssid, password)
-    print(f"starting mDNS at {SERVICE_HOSTNAME}.local (IP address {wifi.radio.ipv4_address})")
+    print(f"starting mDNS at {mdns_hostname}.local (IP address {wifi.radio.ipv4_address})")
     server = mdns.Server(wifi.radio)
     server.hostname = mdns_hostname
     server.advertise_service(service_type="_http", protocol="_tcp", port=listen_on[1])
     pool = socketpool.SocketPool(wifi.radio)
     with pool.socket() as server_socket:
-      yield from self.start_server(server_socket, listen_on, max_parallel_connections)
+      yield from self.start(server_socket, listen_on, max_parallel_connections)
