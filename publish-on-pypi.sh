@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 most_recent_git_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
-sed -i.bak 's/"0.0.0+auto.0"/'"$most_recent_git_tag"'/g' biplane.py
-sed -i.bak 's/"0.0.0+auto.0"/'"$most_recent_git_tag"'/g' pyproject.toml
+sed -i.bak 's/"0.0.0+auto.0"/"'"$most_recent_git_tag"'"/g' biplane.py
+sed -i.bak 's/"0.0.0+auto.0"/"'"$most_recent_git_tag"'"/g' pyproject.toml
 python3 -m pip install --upgrade build twine
 python3 -m build
 mv biplane.py.bak biplane.py
