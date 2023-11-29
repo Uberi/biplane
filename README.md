@@ -165,6 +165,11 @@ asyncio.run(asyncio.gather(blink_builtin_led(), run_server()))  # run both corou
 
 Essentially, we just need to loop through the generator as usual while calling `await asyncio.sleep(0)` each iteration to let other tasks run.
 
+Development
+-----------
+
+All of the application code lives in `biplane.py`. Run tests using `python3 tests/test_basic.py`.
+
 License
 -------
 

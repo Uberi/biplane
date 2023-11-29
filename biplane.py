@@ -129,7 +129,11 @@ class Server:
           return
         if header_line == b"\r\n":  # end of headers
           break
-        header_line = header_line.decode("ascii")
+        try:
+          header_line = header_line.decode("ascii")
+        except UnicodeError:
+          print("malformed header, giving up")
+          return
         if ":" not in header_line:
           print("malformed header, giving up")
           return
