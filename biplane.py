@@ -1,6 +1,6 @@
 import time
 import errno
-
+import os
 
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/Uberi/biplane.git"
@@ -65,6 +65,40 @@ class Response:
       response += f"{name}: {value}\r\n".encode("ascii")
     yield response + b"\r\n" + self.body_bytes
 
+class FileResponse(Response):
+  """
+  Minimal support for serving static files.
+
+  Use it from a handler, e.g.
+  ```
+    @server.route("/config.html","GET")
+    def handle_get_config(query_params, headers, body):
+      return biplane.FileResponse("/www/config.html")
+  ```
+  """
+
+  CONTENT_TYPE_MAP = {
+    'html': 'text/html',
+    'js': 'text/javascript',
+    'css': 'text/css',
+    'png': 'image/png',
+    'json': 'application/json'
+    }
+  def __init__(self, filename, headers={}):
+    try:
+      file_length = os.stat(filename)[6]
+      buf = bytes(file_length)
+      with open(filename,"rb") as file:
+        buf = file.read(file_length)
+      suffix = filename.split('.')[-1]
+      if suffix in self.CONTENT_TYPE_MAP:
+        content_type = self.CONTENT_TYPE_MAP[suffix]
+      else:
+        content_type = "text/plain"
+      super().__init__(buf,status_code=200,content_type=content_type,
+                       headers=headers)
+    except:
+      super().__init__("",status_code=400,headers=headers)
 
 class Server:
   def __init__(self, max_request_line_size=4096, max_header_count=50, max_body_bytes=65536, request_timeout_seconds=10):
@@ -196,7 +230,11 @@ class Server:
     import wifi
     import mdns
     import socketpool
-    wifi.radio.start_ap(ssid=ssid, password=password)
+    try:
+      wifi.radio.start_ap(ssid=ssid, password=password)
+    except NotImplementedError:
+      # workaround for older CircuitPython versions
+      pass
     print(f"starting mDNS at {mdns_hostname}.local (IP address {wifi.radio.ipv4_address_ap})")
     server = mdns.Server(wifi.radio)
     server.hostname = mdns_hostname
