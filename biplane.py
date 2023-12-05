@@ -67,7 +67,7 @@ class Response:
 
 class FileResponse(Response):
   """
-  Minimal support for serving static files.
+  Minimal support for serving static files. Silently assume gzip is supported.
 
   Use it from a handler, e.g.
   ```
@@ -86,11 +86,23 @@ class FileResponse(Response):
     }
   def __init__(self, filename, headers={}):
     try:
-      file_length = os.stat(filename)[6]
+      suffix = filename.split('.')[-1]
+      try:
+        # search for gzipped version first
+        file_length = os.stat(filename+".gz")[6]
+        filename = filename+".gz"
+        headers["content-encoding"] = "gzip"
+      except:
+        # no compressed version found, use given filename
+        try:
+          file_length = os.stat(filename)[6]
+        except:
+          # not found at all
+          raise
+
       buf = bytes(file_length)
       with open(filename,"rb") as file:
         buf = file.read(file_length)
-      suffix = filename.split('.')[-1]
       if suffix in self.CONTENT_TYPE_MAP:
         content_type = self.CONTENT_TYPE_MAP[suffix]
       else:
