@@ -81,6 +81,7 @@ for _ in server.circuitpython_start_wifi_ap("test", "some_password", "app"):
 Starts a server that displays a Hello World page at `http://localhost:8000`, similar to the CircuitPython example above:
 
 ```python
+import socket
 import biplane
 
 server = biplane.Server()
