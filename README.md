@@ -40,7 +40,7 @@ pip install biplane
 
 ### CircuitPython
 
-First, ensure you've set up CircUp according to the [Adafruit CircUp guide](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup). Then:
+To install Biplane using CircUp, ensure you have set it up according to the [Adafruit CircUp guide](https://learn.adafruit.com/keep-your-circuitpython-libraries-on-devices-up-to-date-with-circup). Then:
 
 ```sh
 circup install biplane
@@ -53,6 +53,8 @@ For CircuitPython devices that don't support the CIRCUITPY drive used to upload 
 * As a last-resort slow-but-simple option, using the CircuitPython REPL that you can access over the serial port:
     1. Run `python3 -c 'f=open("biplane.py");code=f.read();print(f"code={repr(code)};open(\"lib/biplane.py\",\"w\").write(code) if len(code)=={len(code)} else print(\"CODE CORRUPTED\")")'` in this folder, and copy the output of that command to the clipboard. This output is CircuitPython code that creates `lib/biplane.py` with the correct contents inside.
     2. Paste the copied output into the CircuitPython REPL and run it. If it outputs "CODE CORRUPTED", that means the code changed between when you pasted it and when it arrived in CircuitPython, which means your serial terminal is sending the characters too quickly and CircuitPython can't keep up (common when using `screen` or `minicom`); to fix this, configure your terminal to wait 2ms-4ms after sending each character and try again (2ms is usually good enough). Also, make sure that you do this after freshly resetting the board.
+
+Lastly, Biplane is part of the [CircuitPython Community Bundle](https://circuitpython.org/libraries), so if you have that installed, then you already have Biplane installed too.
 
 Examples
 --------
@@ -79,6 +81,7 @@ for _ in server.circuitpython_start_wifi_ap("test", "some_password", "app"):
 Starts a server that displays a Hello World page at `http://localhost:8000`, similar to the CircuitPython example above:
 
 ```python
+import socket
 import biplane
 
 server = biplane.Server()
@@ -164,6 +167,11 @@ asyncio.run(asyncio.gather(blink_builtin_led(), run_server()))  # run both corou
 Essentially, we just need to loop through the generator as usual while calling `await asyncio.sleep(0)` each iteration to let other tasks run.
 
 To join an existing wifi network you can use `server.circuitpython_start_wifi_station(ssid, password, hostname)` instead of the call `server.circuitpython_start_wifi_ap` shown in the examples above.
+
+Development
+-----------
+
+All of the application code lives in `biplane.py`. Run tests using `python3 tests/test_basic.py`.
 
 License
 -------

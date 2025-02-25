@@ -110,10 +110,10 @@ class Server:
         start_line += data
       print("received request", start_line)
       if start_line[-1:] != b'\n':
-        print("excessively long start line, giving up")
+        print("excessively long or invalid start line, giving up")
       try:
         method, target, _ = start_line.decode("ascii").split(" ", 2)
-      except UnicodeError:
+      except (UnicodeError, ValueError):
         print("malformed start line, giving up")
         return
 
@@ -125,11 +125,15 @@ class Server:
           yield
           header_line += data
         if header_line[-1:] != b"\n":
-          print("excessively long header, giving up")
+          print("excessively long or invalid header, giving up")
           return
         if header_line == b"\r\n":  # end of headers
           break
-        header_line = header_line.decode("ascii")
+        try:
+          header_line = header_line.decode("ascii")
+        except UnicodeError:
+          print("malformed header, giving up")
+          return
         if ":" not in header_line:
           print("malformed header, giving up")
           return
