@@ -120,13 +120,13 @@ def asyncio_sleep(seconds):  # minimal implementation of asyncio.sleep() as a ge
     yield
 
 def blink_builtin_led():
-  with digitalio.DigitalInOut(pin) as led:
+  with digitalio.DigitalInOut(board.LED) as led:
     led.switch_to_output(value=False)
     while True:
       led.value = not led.value
       yield from asyncio_sleep(0.01)
 
-for _ in zip(blink_builtin_led(), server.circuitpython_start_wifi_ap("test", "some_password")):  # run through both generators at the same time using zip()
+for _ in zip(blink_builtin_led(), server.circuitpython_start_wifi_ap("test", "some_password", "app")):  # run through both generators at the same time using zip()
   pass
 ```
 
@@ -139,7 +139,7 @@ Note that CircuitPython's GC pauses may cause occasional longer pauses - to miti
 Many CircuitPython implementations, especially those for boards with less RAM/flash, don't include the `asyncio` library. However, if `asyncio` is available, Biplane works well with it as well:
 
 ```python
-import time
+import asyncio
 import board
 import digitalio
 import biplane
@@ -151,11 +151,11 @@ def main(query_parameters, headers, body):
   return biplane.Response("<b>Hello, world!</b>", content_type="text/html")
 
 async def run_server():
-  for _ in server.circuitpython_start_wifi_ap("test", "some_password")
+  for _ in server.circuitpython_start_wifi_ap("test", "some_password", "app")
     await asyncio.sleep(0)  # let other tasks run
 
 async def blink_builtin_led():
-  with digitalio.DigitalInOut(pin) as led:
+  with digitalio.DigitalInOut(board.LED) as led:
     led.switch_to_output(value=False)
     while True:
       led.value = not led.value
@@ -165,6 +165,8 @@ asyncio.run(asyncio.gather(blink_builtin_led(), run_server()))  # run both corou
 ```
 
 Essentially, we just need to loop through the generator as usual while calling `await asyncio.sleep(0)` each iteration to let other tasks run.
+
+To join an existing wifi network you can use `server.circuitpython_start_wifi_station(ssid, password, hostname)` instead of the call `server.circuitpython_start_wifi_ap` shown in the examples above.
 
 Development
 -----------
